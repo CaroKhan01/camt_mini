@@ -164,7 +164,7 @@ def process_data(raw_text, research_field, averages_data, percentiles_data):
     research_field_title = research_field.title()
 
     for pub in publications:
-        line = f"The article, \"{pub['title']},\" published in {pub['year']} in {pub['venue']}, has received **{pub['citations']} citations** to date. For all articles published in the category of {research_field_title} in {pub['year']}, the average number of citations is only {pub['average']}."
+        line = f"The article, \"{pub['title']},\" published in {pub['year']} in <i>{pub['venue']}</i>, has received **{pub['citations']} citations** to date. For all articles published in the category of {research_field_title} in {pub['year']}, the average number of citations is only {pub['average']}."
         
         if pub['top_percentile']:
             line += f" This article is thus one of the **<u>top {pub['top_percentile']}</u> most cited articles published in {pub['year']}** in {research_field_title}."
@@ -252,6 +252,7 @@ class App(tk.Tk):
             self.last_result = result
             self.txt_output.delete("1.0", tk.END)
             self.txt_output.tag_config("bold", font=("Segoe UI", 9, "bold"))
+            self.txt_output.tag_config("italic", font=("Segoe UI", 9, "italic"))
             self.txt_output.tag_config("underline", underline=True)
             self.txt_output.tag_config("bold_underline", font=("Segoe UI", 9, "bold"), underline=True)
             
@@ -269,8 +270,16 @@ class App(tk.Tk):
                 if not part: continue
                 
                 if i % 2 == 0:
-                    # Plain text
-                    self.txt_output.insert(tk.END, part)
+                    # Plain text - check for italics <i>...</i>
+                    if '<i>' in part and '</i>' in part:
+                         subparts = re.split(r'(<i>.*?</i>)', part)
+                         for sp in subparts:
+                             if sp.startswith('<i>') and sp.endswith('</i>'):
+                                 self.txt_output.insert(tk.END, sp[3:-4], "italic")
+                             else:
+                                 if sp: self.txt_output.insert(tk.END, sp)
+                    else:
+                        self.txt_output.insert(tk.END, part)
                 else:
                     # Bold text. Check for nested <u>
                     if '<u>' in part and '</u>' in part:
