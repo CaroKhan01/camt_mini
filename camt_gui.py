@@ -74,7 +74,7 @@ def format_title(title):
 
     return "".join(title_chars)
 
-def process_data(raw_text, research_field, averages_data, percentiles_data):
+def process_data(client_name, raw_text, research_field, averages_data, percentiles_data):
     # Split text into lines instead of reading file
     lines = [line.strip() for line in raw_text.splitlines() if line.strip()]
 
@@ -164,7 +164,10 @@ def process_data(raw_text, research_field, averages_data, percentiles_data):
     research_field_title = research_field.title()
 
     for pub in publications:
-        line = f"The article, \"{pub['title']},\" published in {pub['year']} in <i>{pub['venue']}</i>, has received **{pub['citations']} citations** to date. For all articles published in the category of {research_field_title} in {pub['year']}, the average number of citations is only {pub['average']}."
+        if client_name:
+            line = f"{client_name}'s article, \"{pub['title']},\" published in {pub['year']} in <i>{pub['venue']}</i>, has received **{pub['citations']} citations** to date. For all articles published in the category of {research_field_title} in {pub['year']}, the average number of citations is only {pub['average']}."
+        else:
+            line = f"The article, \"{pub['title']},\" published in {pub['year']} in <i>{pub['venue']}</i>, has received **{pub['citations']} citations** to date. For all articles published in the category of {research_field_title} in {pub['year']}, the average number of citations is only {pub['average']}."
         
         if pub['top_percentile']:
             line += f" This article is thus one of the **<u>top {pub['top_percentile']}</u> most cited articles published in {pub['year']}** in {research_field_title}."
@@ -200,6 +203,11 @@ class App(tk.Tk):
         self.combo = ttk.Combobox(top_frame, values=self.fields, width=40)
         if self.fields: self.combo.current(0)
         self.combo.pack(side=tk.LEFT, padx=10)
+
+        # Client Name Entry
+        tk.Label(top_frame, text="Client Name (Optional):").pack(side=tk.LEFT)
+        self.entry_client = tk.Entry(top_frame, width=20)
+        self.entry_client.pack(side=tk.LEFT, padx=10)
 
         # Run Button
         self.btn_run = tk.Button(top_frame, text="Generate CAMT Text", command=self.run_process, bg="#dddddd")
@@ -239,6 +247,7 @@ class App(tk.Tk):
     def run_process(self):
         raw_text = self.txt_input.get("1.0", tk.END).strip()
         field = self.combo.get()
+        client_name = self.entry_client.get().strip()
 
         if not raw_text:
             messagebox.showwarning("Warning", "Please paste data into the input box.")
@@ -248,7 +257,7 @@ class App(tk.Tk):
             return
 
         try:
-            result = process_data(raw_text, field, self.averages_data, self.percentiles_data)
+            result = process_data(client_name, raw_text, field, self.averages_data, self.percentiles_data)
             self.last_result = result
             self.txt_output.delete("1.0", tk.END)
             self.txt_output.tag_config("bold", font=("Segoe UI", 9, "bold"))
