@@ -111,7 +111,7 @@ def process_data(client_name, raw_text, research_field, averages_data, percentil
         venue_chars = list(venue)
         while venue_chars and not venue_chars[-1].isalpha():
             venue_chars.pop()
-        venue = "".join(venue_chars)
+        venue = "".join(venue_chars).title()
 
         parts = citation_year_line.split()
         if len(parts) >= 2:
