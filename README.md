@@ -2,6 +2,7 @@ CAMT Text Generator: Setup and Installation Guide
 Welcome! This guide will walk you through exactly how to get this program running on your computer, even if you have zero technical experience. You only need to do this setup once.
 
 Step 1: Download the Code
+
 Go to the main page of this GitHub repository.
 
 Click the green Code button near the top right of the files.
