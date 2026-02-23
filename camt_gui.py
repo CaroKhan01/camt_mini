@@ -85,6 +85,7 @@ def process_data(client_name, raw_text, research_field, averages_data, percentil
             break
 
     publications = []
+    percentile_counts = {p: 0 for p in ["0.01%", "0.10%", "1.00%", "10.00%", "20.00%"]}
     i = 0
     while i < len(lines):
         if i + 2 >= len(lines): break
@@ -136,7 +137,7 @@ def process_data(client_name, raw_text, research_field, averages_data, percentil
         field_averages = averages_data.get(research_field, {})
         average_citations = field_averages.get(year, "N/A")
 
-        percentiles_to_check = ["0.01%", "0.10%", "1.00%", "10.00%", "20.00%", "50.00%"]
+        percentiles_to_check = ["0.01%", "0.10%", "1.00%", "10.00%", "20.00%"]
         top_percentile = None
         field_percentiles = percentiles_data.get(research_field, {})
         
@@ -149,6 +150,8 @@ def process_data(client_name, raw_text, research_field, averages_data, percentil
                         threshold_val = float(threshold)
                         if citation_count >= threshold_val:
                             top_percentile = p
+                            if p in percentile_counts:
+                                percentile_counts[p] += 1
                             break
                     except (ValueError, TypeError):
                         continue
@@ -176,7 +179,7 @@ def process_data(client_name, raw_text, research_field, averages_data, percentil
             if pub['top_percentile'] in ["0.01%", "0.10%", "1.00%", "10.00%", "20.00%"]:
                  output_lines.append(line)
     
-    return "\n".join(output_lines)
+    return "\n".join(output_lines), percentile_counts
 
 # --- 4. The GUI Class ---
 
@@ -221,15 +224,31 @@ class App(tk.Tk):
         content_frame = tk.Frame(self)
         content_frame.pack(expand=True, fill=tk.BOTH, padx=10, pady=5)
 
-        # Left: Input
-        tk.Label(content_frame, text="1. Paste Google Scholar Data Here:").pack(anchor="w")
-        self.txt_input = scrolledtext.ScrolledText(content_frame, height=10)
+        # Left Side: Input and Output
+        text_frame = tk.Frame(content_frame)
+        text_frame.pack(side=tk.LEFT, expand=True, fill=tk.BOTH)
+
+        tk.Label(text_frame, text="1. Paste Google Scholar Data Here:").pack(anchor="w")
+        self.txt_input = scrolledtext.ScrolledText(text_frame, height=8)
         self.txt_input.pack(expand=True, fill=tk.BOTH, pady=(0, 10))
 
-        # Right: Output
-        tk.Label(content_frame, text="2. Result (Copy from here):").pack(anchor="w")
-        self.txt_output = scrolledtext.ScrolledText(content_frame, height=10, bg="#f0f0f0")
+        tk.Label(text_frame, text="2. Result (Copy from here):").pack(anchor="w")
+        self.txt_output = scrolledtext.ScrolledText(text_frame, height=8, bg="#f0f0f0")
         self.txt_output.pack(expand=True, fill=tk.BOTH)
+
+        # Right Side: Summary Table
+        summary_frame = tk.Frame(content_frame)
+        summary_frame.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
+
+        tk.Label(summary_frame, text="Percentile Summary:").pack(anchor="w")
+        
+        columns = ("percentile", "count")
+        self.summary_table = ttk.Treeview(summary_frame, columns=columns, show="headings", height=5)
+        self.summary_table.heading("percentile", text="Percentile")
+        self.summary_table.heading("count", text="Count")
+        self.summary_table.column("percentile", width=120, anchor="center")
+        self.summary_table.column("count", width=80, anchor="center")
+        self.summary_table.pack(pady=5)
 
     def load_data(self):
         try:
@@ -257,8 +276,16 @@ class App(tk.Tk):
             return
 
         try:
-            result = process_data(client_name, raw_text, field, self.averages_data, self.percentiles_data)
+            result, counts = process_data(client_name, raw_text, field, self.averages_data, self.percentiles_data)
             self.last_result = result
+            
+            # Update Summary Table
+            for item in self.summary_table.get_children():
+                self.summary_table.delete(item)
+            
+            for p, count in counts.items():
+                self.summary_table.insert("", tk.END, values=(p, count))
+
             self.txt_output.delete("1.0", tk.END)
             self.txt_output.tag_config("bold", font=("Segoe UI", 9, "bold"))
             self.txt_output.tag_config("italic", font=("Segoe UI", 9, "italic"))
