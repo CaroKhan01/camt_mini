@@ -1,59 +1,22 @@
-CAMT Text Generator: Setup and Installation Guide
-Welcome! This guide will walk you through exactly how to get this program running on your computer, even if you have zero technical experience. You only need to do this setup once.
+# CAMT Text Generator: User Guide
+## What This Program Does
+Instead of manually typing out citation statistics and comparing them against ESI baselines, this tool takes raw copied text and transforms it into paragraphs.
 
-Step 1: Download the Code
+### Key Features
+* **Automatic Title Formatting:** It reads raw article titles and automatically applies proper title-casing using natural language processing, preserving acronyms and proper nouns.
+* **Instant Data Comparison:** It compares an article's citation count against the average citations and top percentiles (ranging from the top 20% to the top 0.01%) for its specific research field and publication year.
+* **Ready-to-Paste Text:** The program generates the final summary text with all necessary formatting (like **bolding** for citation counts and *italics* for venue names) built-in.
+* **Percentile Summary:** A quick-reference table tracks exactly how many of the pasted articles fall into the top citation tiers.
 
-Go to the main page of this GitHub repository.
+## How to Use It
 
-Click the green Code button near the top right of the files.
+1. **Select the Field:** Choose the relevant research field from the dropdown menu at the top of the window.
+2. **Add a Client Name:** If you enter a client's name, the program will personalize the output sentences.
+3. **Paste Your Data:** Copy your raw publication data and paste it into the top text box labeled "1. Paste Google Scholar Data Here".
+4. **Generate the Text:** Click the **Generate CAMT Text** button.
+5. **Copy the Result:** Click the **Copy Formatted Output** button. This copies the generated paragraphs directly to your clipboard.
 
-Select Download ZIP from the dropdown menu .
+### Example Output
+Depending on the article's performance, the tool generates standardized sentences that look like this:
 
-Once downloaded, double-click the ZIP file to extract (unzip) it.
-
-Move the extracted folder to an easy-to-find place, like your Desktop. Ensure the folder contains the core files, including camt_gui.py, citation_averages.json, and citation_percentiles.json.
-
-Step 2: Install Python
-Python is the engine that runs this application.
-
-Go to the official website: python.org/downloads
-
-Click the big download button for the latest version of Python.
-
-Windows Users (Crucial Step): When you open the installer, look at the very bottom of the first screen. You must check the box that says "Add python.exe to PATH" . If you skip this, the next steps will fail! Click "Install Now" and wait for it to finish.
-
-Mac Users: Simply run the downloaded installer package and click through the standard "Continue" and "Install" prompts.
-
-Step 3: Open your Computer's Terminal
-We need to type a few simple text commands to finish the setup.
-
-Windows: Click your Start menu, type cmd, and open the Command Prompt.
-
-Mac: Press Command + Space on your keyboard to open Spotlight search, type Terminal, and press Enter .
-
-Step 4: Navigate to the Project Folder
-In your terminal window, type the letters cd followed by a single space. (Do not press Enter yet).
-
-Find the extracted project folder from Step 1 on your computer.
-
-Click and drag that folder directly into the terminal window. This automatically pastes the exact path to the folder!
-
-Press Enter.
-
-Step 5: Install the Required Tools
-This program relies on a language processing library called spacy. We need to download it.
-
-Windows: Type pip install spacy and press Enter.
-
-Mac: Type pip3 install spacy and press Enter.
-
-Wait a minute or two for the text to stop scrolling and the installation to complete.
-
-Step 6: Run the Application
-Windows: Type python camt_gui.py and press Enter.
-
-Mac: Type python3 camt_gui.py and press Enter.
-
-Note for the first launch: The program needs a specific English language dictionary (en_core_web_sm) to work. If it doesn't see it, the terminal will say "Spacy model not found. Attempting simple download..." and will automatically download it for you.
-
-After a brief pause, the application window will pop up on your screen, and you are ready to generate your text!
+> [Client Name]'s article, "Properly Capitalized Article Title," published in [Year] in *[Venue Name]*, has received **[X] citations** to date. For all articles published in the category of [Research Field] in [Year], the average number of citations is only [Y]. This article is thus one of the **<u>top [Z]%</u> most cited articles published in [Year]** in [Research Field].
